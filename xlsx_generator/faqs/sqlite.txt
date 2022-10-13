@@ -1,0 +1,30 @@
+Вставлення асортименту і прив'язка лінії та бригади
+
+INSERT INTO assortment ( assortment_name, work_center, brigade_id)
+VALUES (
+	'ШОКОЛАД Lacmi молочний з арахісом і карамельно-арахісовою начинкою ВКФ 295г /12шт', 
+	(SELECT work_center_id FROM work_centres WHERE work_center_name like 'Лінія шоколаду (MAZ №8)'),
+	(SELECT id FROM brigades WHERE comment like '%ара%')
+	);
+		
+
+		
+INSERT INTO brigades (composition, comment)
+VALUES (
+		'4рв, 4рв, 4рв, 3рв, СТз, 4рз, 4рз, 4рз, укл, укл, укл, укл, укл, укл, укл', 
+		'МАЗ-2 з начинкою, крем-брюле, карамель'
+		);
+
+Запиит дл отримання складу бригади і назву лінії
+SELECT 
+(
+SELECT short_name FROM work_centres 
+INNER JOIN assortment on assortment.work_center = work_centres.work_center_id
+WHERE assortment.assortment_name like '%Батон ROSHEN молочно-шоколадний з арахісовою начинкою ВКФ 38г /180ш%' LIMIT 1
+) 
+as work_center,
+composition
+
+FROM brigades 
+INNER JOIN assortment on assortment.brigade_id = brigades.id
+WHERE assortment.assortment_name like '%Батон ROSHEN молочно-шоколадний з арахісовою начинкою ВКФ 38г /180ш%' LIMIT 1;
