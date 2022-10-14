@@ -75,6 +75,31 @@ def sqlite_insert_assortment(assortment_name, work_center_id, brigade_id):
     assortments_db.close()
 
 
+def sqlite_positions_list():
+    positions_request = 'SELECT position_name FROM positions;'
+    positions_db = sqlite3.connect("staff.db")
+    positions_cursor = positions_db.cursor()
+    positions_list = positions_cursor.execute(positions_request).fetchall()
+    positions_db.close()
+    return [i[0] for i in positions_list]
+
+
+def sqlite_insert_brigade_composition(composition, comment):
+    brigade_composition_request = f"""INSERT INTO brigades(composition, comment)
+                                    VALUES('{composition}', '{comment}');"""
+    brigade_composition_request_db = sqlite3.connect("staff.db")
+    brigade_composition_request_cursor = brigade_composition_request_db.cursor()
+    brigade_composition_request_cursor.execute(brigade_composition_request)
+    brigade_composition_request_db.commit()
+    brigade_composition_request_db.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -86,9 +111,9 @@ if __name__ == '__main__':
     #assortment_name = 'ЦУКЕРКИ Ko-Ko Choco White ВКФ 1кг /5пак'
     #print(work_centres_list())
 
-    print([i for i in work_centres_list()])
-    print(brigades_request_qt())
-    print(sqlite_is_assortment_exist('ШОКОЛАД Lacmi молочний з цілими лісовими горіхами і шоколао-карамельною начинкою ВКФ 295г /12шт'))
+    print([i for i in brigades_request_qt()])
+    #print(brigades_request_qt())
+    #print(sqlite_is_assortment_exist('ШОКОЛАД Lacmi молочний з цілими лісовими горіхами і шоколао-карамельною начинкою ВКФ 295г /12шт'))
 
 
 
