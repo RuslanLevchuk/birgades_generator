@@ -47,7 +47,7 @@ def generate(file_path='Ежедневный план выпуска проду�
     temporary_data = parse(dic)
 
     folder_path = '/'.join(file_path.split('/')[:-1])+'/'
-    excel_filename = f'{folder_path}spysok_{datetime.datetime.now()}.xlsx'
+    excel_filename = f'{folder_path}spysok_{datetime.datetime.now()}.xlsx'.replace(':','_')
 
     workbook = xlsxwriter.Workbook(excel_filename)
 
