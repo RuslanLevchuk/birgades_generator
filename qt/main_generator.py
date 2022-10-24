@@ -47,11 +47,11 @@ def generate(file_path='Ежедневный план выпуска проду�
     temporary_data = parse(dic)
 
     folder_path = '/'.join(file_path.split('/')[:-1])+'/'
-    excel_filename = f'{folder_path}spysok_{datetime.datetime.now()}.xlsx'.replace(':','_')
+    excel_filename = f'{folder_path}spysok_{str(datetime.datetime.now()).replace(":","_")}.xlsx'
 
     workbook = xlsxwriter.Workbook(excel_filename)
 
-    format_date = workbook.add_format({'align': 'center', 'border': 1, 'bold': 1, 'bg_color': '#53ff1d', 'num_format': 'd mmm, nn'})
+    format_date = workbook.add_format({'align': 'center', 'border': 1, 'bold': 1, 'bg_color': '#53ff1d', 'num_format': 'd mmm, nnn'})
     format_green_bold = workbook.add_format({'align': 'center', 'border': 1, 'bold': 1, 'bg_color': '#53ff1d'})
     format_yellow = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#ffff00'})
     format_gray = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#cccccc'})

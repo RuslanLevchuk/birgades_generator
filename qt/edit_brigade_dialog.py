@@ -1,7 +1,8 @@
 
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from sqlite_request import sqlite_positions_list, brigades_request_qt, sqlite_insert_brigade_composition
+from sqlite_request import sqlite_positions_list, brigades_request_qt, sqlite_insert_brigade_composition, \
+    sqlite_edit_brigade_composition, sqlite_delete_brigade_composition
 
 
 class Ui_Dialog(object):
@@ -10,6 +11,10 @@ class Ui_Dialog(object):
         # ініціалізація списка, у якому будуть зберігатись екземпляри лейблів, комбобоксів, кнопок видалення
         # кожної штатної одиниці бригади
         self.lst = []
+        self.current_index = None
+
+        for i in brigades_request_qt():
+            print(i)
 
 
 
@@ -20,13 +25,33 @@ class Ui_Dialog(object):
 
         #ініціалізація вікна
         Dialog.setObjectName("Dialog")
-        Dialog.resize(710, 600)
+        Dialog.resize(710, 550)
+
+
+        self.brigade_names_combobox_label = QtWidgets.QLabel(Dialog)
+        self.brigade_names_combobox_label.setGeometry(QtCore.QRect(10, 15, 481, 26))
+        self.brigade_names_combobox_label.setText('Назви бригад:')
+
+        self.brigade_names_combobox = QtWidgets.QComboBox(Dialog)
+        self.brigade_names_combobox.setGeometry(QtCore.QRect(10, 40, 481, 26))
+        self.brigade_names_combobox.addItems(['Обрати бригаду']+[i[2] for i in brigades_request_qt()])
+        self.brigade_names_combobox.currentTextChanged.connect(self.chose_brigade_for_edit)
+
+        # кнопка додавання штатної одиниці. дія - додати лейбл-комбобокс-кнопку як одну штатно одиницю
+        self.delete_brigade_composition_button = QtWidgets.QPushButton(Dialog)
+        self.delete_brigade_composition_button.setGeometry(QtCore.QRect(510, 40, 150, 27))
+        self.delete_brigade_composition_button.setObjectName("del brigade")
+        self.delete_brigade_composition_button.setText('Видалити бригаду')
+        self.delete_brigade_composition_button.setEnabled(False)
+        self.delete_brigade_composition_button.clicked.connect(self.delete_brigade_button_pressed)
+
 
         #кнопка додавання штатної одиниці. дія - додати лейбл-комбобокс-кнопку як одну штатно одиницю
         self.pushButton = QtWidgets.QPushButton(Dialog)
-        self.pushButton.setGeometry(QtCore.QRect(510, 90, 150, 27))
+        self.pushButton.setGeometry(QtCore.QRect(510, 150, 150, 27))
         self.pushButton.setObjectName("pushButton")
         self.pushButton.clicked.connect(self.add_update_position_comboboxes)
+        self.pushButton.hide()
 
         #додавання зони скроллінгу
         self.scrollArea = QtWidgets.QScrollArea(Dialog)
@@ -54,31 +79,33 @@ class Ui_Dialog(object):
         self.brigade_comment_lineedit.setGeometry(QtCore.QRect(10, 100, 481, 26))
         self.brigade_comment_lineedit.setObjectName("lineEdit")
         self.brigade_comment_lineedit.textChanged.connect(self.position_combobox_changed)
+        self.brigade_comment_lineedit.hide()
 
         #створення пари кнопок - Зберегти і Скасувати
         #вказуємо дії при їх натисненні. Кнопка Зберегти неактивна по дефолту
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(520, 380, 166, 27))
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setGeometry(QtCore.QRect(520, 500, 166, 27))
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Save)
         self.buttonBox.setObjectName("buttonBox")
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).clicked.connect(self.ok_button_pressed)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Save).setEnabled(False)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Save).clicked.connect(self.save_button_pressed)
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).clicked.connect(Dialog.close)
 
         #лейбл підпису рядка коментів
         self.brigade_comment_label = QtWidgets.QLabel(Dialog)
         self.brigade_comment_label.setGeometry(QtCore.QRect(10, 80, 200, 16))
         self.brigade_comment_label.setObjectName("label")
+        self.brigade_comment_label.hide()
 
         #лейбл підису "Склад бригади"
         self.brigade_compos_label = QtWidgets.QLabel(Dialog)
-        self.brigade_compos_label.setGeometry(QtCore.QRect(10, 420, 200, 16))
+        self.brigade_compos_label.setGeometry(QtCore.QRect(10, 500, 200, 16))
         self.brigade_compos_label.setObjectName("label")
         self.brigade_compos_label.setText('Склад бригади:')
 
         #динамічний лейбл, де висвітлюється динамічна інфа про обраний склад бригади
         self.brigade_compos_active_label = QtWidgets.QLabel(Dialog)
-        self.brigade_compos_active_label.setGeometry(QtCore.QRect(135, 420, 600, 16))
+        self.brigade_compos_active_label.setGeometry(QtCore.QRect(135, 500, 600, 16))
         self.brigade_compos_active_label.setObjectName("label")
         self.font_br_compos_lbl = self.brigade_compos_active_label.font()
         self.font_br_compos_lbl.setPointSize(9)
@@ -91,24 +118,66 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Редагувати Бригаду"))
         self.pushButton.setText(_translate("Dialog", "< Додати позицію"))
         self.brigade_comment_label.setText(_translate("Dialog", "Коментар про бригаду"))
 
 
+    def chose_brigade_for_edit(self):
+        if self.brigade_names_combobox.currentIndex() == 0:
+            self.pushButton.hide()
+            self.brigade_comment_lineedit.hide()
+            self.brigade_comment_label.hide()
+        else:
+            self.pushButton.show()
+            self.brigade_comment_lineedit.show()
+            self.brigade_comment_label.show()
+        # приховання усіх елементів списку бригади перед видаленням
+        for element in self.lst:
+            element[0].hide()
+            element[1].hide()
+            element[2].hide()
+        self.lst = []
+        # зменшений список елементів мусить одновитись і відобразитись
+        self.update()
 
-    def add_update_position_comboboxes(self, Dialog):
+        #print(brigades_request_qt()[self.brigade_names_combobox.currentIndex()-1])
+
+
+
+        if self.brigade_names_combobox.currentIndex() == 0:
+            self.delete_brigade_composition_button.setEnabled(False)
+            self.brigade_comment_lineedit.clear()
+        else:
+            self.current_index = self.brigade_names_combobox.currentIndex()-1
+            print(brigades_request_qt()[self.current_index][0])
+
+
+
+            self.brigade_comment_lineedit.setText(brigades_request_qt()[self.current_index][2])
+            for position in brigades_request_qt()[self.current_index][1].split(', '):
+                self.add_update_position_comboboxes(position)
+
+            self.delete_brigade_composition_button.setEnabled(True)
+
+
+
+
+
+
+    def add_update_position_comboboxes(self, position=None):
         #при натисненні додавання групи віджетів додавання штатної одиниці створюються екземпляри лейбл-комбобокс-кнопка
         #і додабться у вигляді сету до списку, який триматиме всі додані групи віджетів
 
-        but, combobox, label = self.add_position_button_combobox()
+        but, combobox, label = self.add_position_button_combobox(position)
         self.lst.append((label, combobox, but))
         #після кожного додвання запускається оновлення(перемальовування)
         self.update()
 
 
 
-    def add_position_button_combobox(self):
+    def add_position_button_combobox(self, position=None):
+
         #створення екземпляра лейбла
         self.pisition_label = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         font = QtGui.QFont()
@@ -118,6 +187,9 @@ class Ui_Dialog(object):
         #створення екземпларя комобобокса і запуск функції переевірок при зміні значення комбобокса
         self.position_combobox = QtWidgets.QComboBox(self.scrollAreaWidgetContents)
         self.position_combobox.addItems(sqlite_positions_list())
+        if position:
+            self.position_combobox.setCurrentText(position)
+
         self.position_combobox.currentTextChanged.connect(self.position_combobox_changed)
 
         #створення екземпляра кнопки + дія (функція) при натисенні
@@ -130,6 +202,8 @@ class Ui_Dialog(object):
 
 
     def update(self):
+
+
         #оновлення елементів скролліногового поля і їх перемальовування
 
         for index, element in enumerate(self.lst):
@@ -154,9 +228,9 @@ class Ui_Dialog(object):
         #під більшу кількість елементів підганяється свій розмір поля
         for index, element in enumerate(self.lst):
             if index == 0:
-                self.scrollArea.setGeometry(QtCore.QRect(10, 80, 481, 48))
+                self.scrollArea.setGeometry(QtCore.QRect(10, 140, 481, 48))
             if index < 9 and index != 0:
-                self.scrollArea.setGeometry(QtCore.QRect(10, 80, 481, 10+35*(index+1)))
+                self.scrollArea.setGeometry(QtCore.QRect(10, 140, 481, 10+35*(index+1)))
 
             #і додаємо кожен елемент у кожне поле сітки скорлліногового поля
             self.button_layout.addWidget(element[0], index, 0)
@@ -167,6 +241,8 @@ class Ui_Dialog(object):
             element[0].show()
             element[1].show()
             element[2].show()
+
+        self.position_combobox_changed()
 
 
 
@@ -199,23 +275,33 @@ class Ui_Dialog(object):
             #якщо така бригада вже існує, то кнопка збереження нективна і встановлюємо підпис про те, що бригада існує
             if brigade_composition_string == i[1]:
                 self.brigade_compos_active_label.setText(f'Такий склад бригади вже існує! Назва: "{i[2]}"')
-                self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
+                self.buttonBox.button(QtWidgets.QDialogButtonBox.Save).setEnabled(False)
                 break
             #якщо введено хочаб найменший коментар і обрано хоч одну штатну одиницю, то кнопка зебереження активна
             elif self.brigade_comment_lineedit.text() != '' and len(brigade_composition_string) > 0:
-                self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
+                self.buttonBox.button(QtWidgets.QDialogButtonBox.Save).setEnabled(True)
             #інакше кнопка не активна
             else:
-                self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
+                self.buttonBox.button(QtWidgets.QDialogButtonBox.Save).setEnabled(False)
 
 
 
-    def ok_button_pressed(self):
+    def save_button_pressed(self):
         #при натисненні кнопки збереження викликається функція, яка зберігає склад бригади, отриманий з комбобоксів
         #у вигляді переліку через кому, і коментар до цієї бригади, після збереження діалог заривається
         brigade_composition_string = ', '.join(i[1].currentText() for i in self.lst)
-        sqlite_insert_brigade_composition(brigade_composition_string, self.brigade_comment_lineedit.text())
+        sqlite_edit_brigade_composition(brigade_composition_string, self.brigade_comment_lineedit.text(), self.current_index)
         self.Dialog.close()
+
+
+    def delete_brigade_button_pressed(self):
+
+        sqlite_delete_brigade_composition(brigades_request_qt()[self.current_index][0])
+        self.brigade_names_combobox.setCurrentIndex(0)
+        self.brigade_comment_lineedit.clear()
+        self.brigade_names_combobox.clear()
+        self.brigade_names_combobox.addItems(['Обрати бригаду'] + [i[2] for i in brigades_request_qt()])
+        self.current_index = None
 
 
 

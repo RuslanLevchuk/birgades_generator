@@ -95,6 +95,31 @@ def sqlite_insert_brigade_composition(composition, comment):
 
 
 
+def sqlite_edit_brigade_composition(composition, comment, id):
+    brigade_composition_request = f"""UPDATE brigades
+                                    SET comment = '{comment}',
+                                        composition = '{composition}'
+                                    WHERE
+                                    id = {id};"""
+
+    brigade_composition_request_db = sqlite3.connect("staff.db")
+    brigade_composition_request_cursor = brigade_composition_request_db.cursor()
+    brigade_composition_request_cursor.execute(brigade_composition_request)
+    brigade_composition_request_db.commit()
+    brigade_composition_request_db.close()
+
+
+
+def sqlite_delete_brigade_composition(id):
+    brigade_composition_request = f"""delete from brigades WHERE id = {id};"""
+
+    brigade_composition_request_db = sqlite3.connect("staff.db")
+    brigade_composition_request_cursor = brigade_composition_request_db.cursor()
+    brigade_composition_request_cursor.execute(brigade_composition_request)
+    brigade_composition_request_db.commit()
+    brigade_composition_request_db.close()
+
+
 
 
 

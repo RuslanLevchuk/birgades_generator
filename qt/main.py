@@ -4,6 +4,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from add_assortment_dialog import Ui_Dialog as UI_add_assortment_dialog
 from add_brigade_dialog import Ui_Dialog as UI_add_brigade_dialog
+from edit_brigade_dialog import Ui_Dialog as UI_edit_brigade_dialog
 from main_generator import generate as generate_xlsx
 
 
@@ -17,6 +18,12 @@ class Ui_MainWindow(object):
     def open_dialog_add_brigade(self):
         self.window = QtWidgets.QDialog()
         self.ui = UI_add_brigade_dialog()
+        self.ui.setupUi(self.window)
+        self.window.show()
+
+    def open_dialog_edit_brigade(self):
+        self.window = QtWidgets.QDialog()
+        self.ui = UI_edit_brigade_dialog()
         self.ui.setupUi(self.window)
         self.window.show()
 
@@ -45,6 +52,8 @@ class Ui_MainWindow(object):
         self.make_brigades_button = QtWidgets.QPushButton(self.centralwidget)
         self.make_brigades_button.setGeometry(QtCore.QRect(760, 35, 200, 30))
         self.make_brigades_button.setText('Сформувати завдання')
+        self.make_brigades_button.setEnabled(False)
+
         self.make_brigades_button.clicked.connect(self.generate_button_action)
 
 
@@ -55,10 +64,15 @@ class Ui_MainWindow(object):
         self.q_add_asortment_button.setText('Додати Асортимент')
         self.q_add_asortment_button.clicked.connect(self.open_dialog_add_assortment)
 
-        self.q_add_asortment_button_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.q_add_asortment_button_2.setGeometry(QtCore.QRect(600, 725, 150, 30))
-        self.q_add_asortment_button_2.setText('Додати Бригаду')
-        self.q_add_asortment_button_2.clicked.connect(self.open_dialog_add_brigade)
+        self.q_add_brigade_button = QtWidgets.QPushButton(self.centralwidget)
+        self.q_add_brigade_button.setGeometry(QtCore.QRect(415, 725, 150, 30))
+        self.q_add_brigade_button.setText('Додати Бригаду')
+        self.q_add_brigade_button.clicked.connect(self.open_dialog_add_brigade)
+
+        self.q_edit_brigade_button = QtWidgets.QPushButton(self.centralwidget)
+        self.q_edit_brigade_button.setGeometry(QtCore.QRect(590, 725, 160, 30))
+        self.q_edit_brigade_button.setText('Редагувати Бригаду')
+        self.q_edit_brigade_button.clicked.connect(self.open_dialog_edit_brigade)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -88,17 +102,15 @@ class Ui_MainWindow(object):
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget, "Відкрити файл EXCEL", "",
                                                   'Excel Files (*.xlsx)', options=options)
         self.open_xlsx_file_lineedit.setText(fileName)
+        if self.open_xlsx_file_lineedit.text() != '':
+            self.make_brigades_button.setEnabled(True)
 
-
-
-    def openFileNameDialog(self):
-        file = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget, 'Load motor', '', 'Excel Files (*.xlsx)')[0]
-        self.open_xlsx_file_lineedit.text()
 
 
     def generate_button_action(self):
         generate_xlsx(self.open_xlsx_file_lineedit.text())
         self.open_xlsx_file_lineedit.clear()
+        self.make_brigades_button.setEnabled(False)
 
 
 if __name__ == "__main__":

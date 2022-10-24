@@ -28,3 +28,8 @@ composition
 FROM brigades 
 INNER JOIN assortment on assortment.brigade_id = brigades.id
 WHERE assortment.assortment_name like '%Батон ROSHEN молочно-шоколадний з арахісовою начинкою ВКФ 38г /180ш%' LIMIT 1;
+
+
+
+INSERT INTO work_centres (work_center_name, short_name)
+VALUES ('Лінія шоколадних батонів (MAZ №4)', 'MAZ-4');

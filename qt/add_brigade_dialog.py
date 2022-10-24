@@ -92,7 +92,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Додати Бригаду"))
         self.pushButton.setText(_translate("Dialog", "< Додати позицію"))
         self.brigade_comment_label.setText(_translate("Dialog", "Коментар про бригаду"))
 
