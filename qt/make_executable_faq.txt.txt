@@ -1,0 +1,1 @@
+pyinstaller --noconfirm --onedir --windowed --add-data "D:/Development/brigades_generator/qt/staff.db;."  "D:/Development/brigades_generator/qt/main.py"
