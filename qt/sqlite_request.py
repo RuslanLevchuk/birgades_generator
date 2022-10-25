@@ -67,7 +67,7 @@ def sqlite_is_assortment_exist(name):
 
 def sqlite_insert_assortment(assortment_name, work_center_id, brigade_id):
     assortments_request = f"""INSERT INTO assortment ( assortment_name, work_center, brigade_id)
-                            VALUES ('{assortment_name}', {int(work_center_id)}, {int(brigade_id)});"""
+                            VALUES ('{assortment_name.replace("'", "''")}', {int(work_center_id)}, {int(brigade_id)});"""
     assortments_db = sqlite3.connect("staff.db")
     assortments_cursor = assortments_db.cursor()
     assortments_cursor.execute(assortments_request)

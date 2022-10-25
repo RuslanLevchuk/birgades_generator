@@ -33,3 +33,5 @@ WHERE assortment.assortment_name like '%Батон ROSHEN молочно-шок�
 
 INSERT INTO work_centres (work_center_name, short_name)
 VALUES ('Лінія шоколадних батонів (MAZ №4)', 'MAZ-4');
+
+INSERT INTO positions (position_name, grade) VALUES ('2р', 2);

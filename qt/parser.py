@@ -2,7 +2,7 @@ import pandas as pd
 
 
 
-def week_task_dict(file_path):
+def week_task_dict(file_path='2.xlsx'):
     file = pd.read_excel(file_path,  usecols="A:Z", skiprows=2)
 
     excel_full_table = file.to_dict()
@@ -44,7 +44,7 @@ def week_task_dict(file_path):
             temporary_date = cropped_task_table['Дата директивна'][num]
             temporary_shift = str(int(cropped_task_table['Зміна'][num]))
             temporary_work_center = cropped_task_table['Робочий центр'][num]
-            temporary_product_name = cropped_task_table['Найменування'][num]
+            temporary_product_name = cropped_task_table['Найменування'][num].replace("'", "''")
             temporary_plan_tonnage = cropped_task_table['План (кг)'][num]
             temporary_comment = cropped_task_table['Коментар'][num]
 
@@ -58,13 +58,14 @@ def week_task_dict(file_path):
                 modified_task_table[temporary_date][temporary_shift][temporary_work_center][temporary_product_name] = [temporary_plan_tonnage, temporary_comment]
 
 
+    data = {}
 
+    for key, value in sorted(modified_task_table.items()):
+        data[key] = value
 
-    return modified_task_table
+    return data
 
 if __name__ == '__main__':
     dict = week_task_dict()
+    print(dict)
 
-    for date, shift in dict.items():
-        print(date)
-        print('     ')
