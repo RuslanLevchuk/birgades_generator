@@ -16,9 +16,10 @@ def generate(file_path='Ежедневный план выпуска проду�
                 return 'date'
         except ValueError:
             work_centre = [i[0] for i in work_centres_list()]
-            yellow_list = ['СТв', '4рв']
-            gray_list = ['СТз', '4рз']
+            yellow_list = ['СТв', '4рв', 'CТв']
+            gray_list = ['СТз', '4рз', 'CТз']
             blue_list = ['3рв', '3рз']
+            light_blue_list = ['Рец', 'Зав', '4рвар']
             if cell_data in work_centre:
                 return 'work centre'
             elif cell_data in yellow_list:
@@ -27,6 +28,8 @@ def generate(file_path='Ежедневный план выпуска проду�
                 return 'gray'
             elif cell_data in blue_list:
                 return 'blue'
+            elif cell_data in light_blue_list:
+                return 'light_blue'
             elif len(cell_data) > 15:
                 return 'red'
             else:
@@ -56,6 +59,7 @@ def generate(file_path='Ежедневный план выпуска проду�
     format_yellow = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#ffff00'})
     format_gray = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#cccccc'})
     format_blue = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#b4c7fc'})
+    format_light_blue = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#87cefa'})
     format_white = workbook.add_format({'align': 'center', 'border': 1})
     format_red = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#ff0000'})
 
@@ -66,7 +70,8 @@ def generate(file_path='Ежедневный план выпуска проду�
         'gray': format_gray,
         'blue': format_blue,
         'white': format_white,
-        'red': format_red
+        'red': format_red,
+        'light_blue': format_light_blue
     }
 
 

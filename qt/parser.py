@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def week_task_dict(file_path='2.xlsx'):
-    file = pd.read_excel(file_path,  usecols="A:Z", skiprows=2)
+    file = pd.read_excel(file_path,  usecols="A:P", skiprows=2)
 
     excel_full_table = file.to_dict()
 
