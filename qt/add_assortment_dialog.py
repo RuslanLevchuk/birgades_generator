@@ -24,7 +24,7 @@ class Ui_Dialog(object):
         # випадаючий список складу бригад згідно відповіді із запиту у боазу даних таблиці бригад
         # перши індекс - це склад бригади
         self.brigade_composition_combobox = QtWidgets.QComboBox(Dialog)
-        self.brigade_composition_combobox.addItems([i[1] for i in brigades_request_qt()])
+        self.brigade_composition_combobox.addItems([i[2]+' // '+i[1] for i in brigades_request_qt()])
         # при зміні вибраного занчення у списку бригад викликається функція зміни підпису під ним,
         # якій передається індекс обраного елемента списку
         self.brigade_composition_combobox.currentTextChanged.connect(

@@ -7,7 +7,7 @@ import datetime
 import sys
 import subprocess
 
-def generate(file_path='Ежедневный план выпуска продукции _ Варіант_ План _ Директивна дата з 25.10.2021 по 31.10_Z55AI5A04.xlsx'):
+def generate(file_path='2.xlsx'):
 
 
     def cell_check(cell_data):
@@ -50,11 +50,12 @@ def generate(file_path='Ежедневный план выпуска проду�
     temporary_data = parse(dic)
 
     folder_path = '/'.join(file_path.split('/')[:-1])+'/'
-    excel_filename = f'{folder_path}spysok_{str(datetime.datetime.now()).replace(":","_")}.xlsx'
+    print(folder_path)
+    excel_filename = f'{folder_path}spysok_{str(datetime.datetime.now()).replace(":","_").replace(" ", "_" )}.xlsx'
 
     workbook = xlsxwriter.Workbook(excel_filename)
 
-    format_date = workbook.add_format({'align': 'center', 'border': 1, 'bold': 1, 'bg_color': '#53ff1d', 'num_format': 'd mmm, nnn'})
+    format_date = workbook.add_format({'align': 'center', 'border': 1, 'bold': 1, 'bg_color': '#53ff1d', 'num_format': 'dd mmm, ddd'})
     format_green_bold = workbook.add_format({'align': 'center', 'border': 1, 'bold': 1, 'bg_color': '#53ff1d'})
     format_yellow = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#ffff00'})
     format_gray = workbook.add_format({'align': 'center', 'border': 1, 'bg_color': '#cccccc'})
@@ -108,8 +109,9 @@ def generate(file_path='Ежедневный план выпуска проду�
             subprocess.call(['libreoffice', excel_filename])
         except FileNotFoundError:
             print('LibreOffice not found')
-    else:
-        pass
+    elif sys.platform == 'win32':
+        import os
+        os.system(f'start excel.exe {excel_filename}')
 
 
 

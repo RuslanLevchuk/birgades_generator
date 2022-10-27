@@ -5,10 +5,10 @@ block_cipher = None
 
 
 a = Analysis(
-    ['main.py'],
+    ['D:/Development/brigades_generator/qt/main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('D:/Development/brigades_generator/qt/staff.db', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -31,7 +31,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
